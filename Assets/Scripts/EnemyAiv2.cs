@@ -33,10 +33,6 @@ public class EnemyAiv2 : MonoBehaviour
     public GameObject Spawner;
 
     public GameObject[] Walls;      
-    
-    bool search=true;
-
-
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -49,9 +45,7 @@ public class EnemyAiv2 : MonoBehaviour
     private void Start()
     {
         SpawnerPos = Spawner.transform;
-
     }
-
     void Update()
     {
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
@@ -60,30 +54,31 @@ public class EnemyAiv2 : MonoBehaviour
         //if (!playerInSightRange && !playerInAttackRange && health > 30) Patroling();
         //if (playerInSightRange && !playerInAttackRange && health > 30) ChasePlayer();
         //if (playerInSightRange && playerInAttackRange && health > 30) AttackPlayer();
-        if(playerInSightRange) Hide();
+        Hide();
 
     }
-
-
     void Hide()
     {
         RaycastHit raycastHit;
+        print(hidePointSet);
 
         if (!hidePointSet)
         {
             HideFromPlayer();
         }
 
-        else agent.SetDestination(hidePoint);
+        if (hidePointSet) agent.SetDestination(hidePoint);
 
         if (Physics.Raycast(transform.position, player.transform.position, out raycastHit, sightRange))
         {
-            if (raycastHit.transform.tag == "Player") hidePointSet=false;
-        }
+            if (raycastHit.transform.tag == "Player") hidePointSet = false;
+        } 
+        
+        Debug.DrawRay(transform.position, player.transform.position, Color.red);
     }
-
     void HideFromPlayer()
     {
+        RaycastHit hit;
         GameObject closeWall = Walls[0];
         float randomZ = Random.Range(-hidePointRange, hidePointRange);
         float randomX = Random.Range(-hidePointRange, hidePointRange);
@@ -97,19 +92,16 @@ public class EnemyAiv2 : MonoBehaviour
         }
 
         hidePoint = new Vector3(closeWall.transform.position.x + randomX, transform.position.y, closeWall.transform.position.z + randomZ);
-
-        RaycastHit hit;
+    
         if (Physics.Raycast(hidePoint, -transform.up, whatIsGround) ) 
         {
-            if (Physics.Raycast(hidePoint, player.transform.position, out hit, 500))
+            if (Physics.Raycast(hidePoint, player.transform.position, out hit, sightRange))
             {
-                
                 if (hit.transform.tag == "Wall")
                 {
-                    hidePointSet = true; 
+                    hidePointSet = true;
                 }
             }     
-
         }
     }
 
