@@ -32,6 +32,7 @@ public class EnemyAiv2 : MonoBehaviour
     public Transform SpawnerPos;
     public GameObject Spawner;
 
+
     public GameObject[] Walls;      
     private void Awake()
     {
@@ -41,7 +42,6 @@ public class EnemyAiv2 : MonoBehaviour
         Spawner = GameObject.Find("SpawnerWhite");
         Walls = GameObject.FindGameObjectsWithTag("Wall");
     }
-
     private void Start()
     {
         SpawnerPos = Spawner.transform;
@@ -54,13 +54,12 @@ public class EnemyAiv2 : MonoBehaviour
         //if (!playerInSightRange && !playerInAttackRange && health > 30) Patroling();
         //if (playerInSightRange && !playerInAttackRange && health > 30) ChasePlayer();
         //if (playerInSightRange && playerInAttackRange && health > 30) AttackPlayer();
-        Hide();
-
+        if(playerInSightRange) Hide();
     }
     void Hide()
     {
-        RaycastHit raycastHit;
-        print(hidePointSet);
+        RaycastHit raycastHit; 
+        Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward)*sightRange, Color.red);
 
         if (!hidePointSet)
         {
@@ -69,12 +68,15 @@ public class EnemyAiv2 : MonoBehaviour
 
         if (hidePointSet) agent.SetDestination(hidePoint);
 
-        if (Physics.Raycast(transform.position, player.transform.position, out raycastHit, sightRange))
+        Vector3 distantToHidePoint = transform.position - hidePoint;
+        if (distantToHidePoint.magnitude < 1)
         {
-            if (raycastHit.transform.tag == "Player") hidePointSet = false;
-        } 
-        
-        Debug.DrawRay(transform.position, player.transform.position, Color.red);
+            transform.LookAt(player.transform);
+            if (Physics.Raycast(transform.position,transform.TransformDirection(Vector3.forward), out raycastHit, sightRange))
+            {
+                if (raycastHit.transform.tag == "Player") hidePointSet = false;
+            }
+        }
     }
     void HideFromPlayer()
     {
@@ -82,6 +84,7 @@ public class EnemyAiv2 : MonoBehaviour
         GameObject closeWall = Walls[0];
         float randomZ = Random.Range(-hidePointRange, hidePointRange);
         float randomX = Random.Range(-hidePointRange, hidePointRange);
+        Debug.DrawRay(hidePoint, player.transform.position * sightRange, Color.green, 2);
 
         for (int i = 0; i < Walls.Length; i++)
         {
@@ -93,9 +96,9 @@ public class EnemyAiv2 : MonoBehaviour
 
         hidePoint = new Vector3(closeWall.transform.position.x + randomX, transform.position.y, closeWall.transform.position.z + randomZ);
     
-        if (Physics.Raycast(hidePoint, -transform.up, whatIsGround) ) 
+        if (Physics.Raycast(hidePoint, -transform.up, whatIsGround)) 
         {
-            if (Physics.Raycast(hidePoint, player.transform.position, out hit, sightRange))
+            if (Physics.Raycast(hidePoint, player.transform.position-transform.position ,out hit, sightRange))
             {
                 if (hit.transform.tag == "Wall")
                 {
@@ -104,7 +107,6 @@ public class EnemyAiv2 : MonoBehaviour
             }     
         }
     }
-
     IEnumerator Repair()
     {
         int i = 0, repairValue=5;
@@ -124,7 +126,6 @@ public class EnemyAiv2 : MonoBehaviour
         agent.SetDestination(SpawnerPos.position);
         StartCoroutine(Repair());
     }
-
     void Patroling()
     {
         if (!walkPointSet) SearchWalkPoint();
@@ -141,7 +142,6 @@ public class EnemyAiv2 : MonoBehaviour
             walkPointSet = false;
         }
     }
-
     void SearchWalkPoint()
     {
         float randomZ = Random.Range(-walkPointRange, walkPointRange);
@@ -155,15 +155,12 @@ public class EnemyAiv2 : MonoBehaviour
             {
                 walkPointSet = true; 
             }
-            
         }
     }
-
     void ChasePlayer()
     {
         agent.SetDestination(player.transform.position);
     }
-
     void AttackPlayer()
     {
         Vector3 fwd = transform.TransformDirection(Vector3.forward);
@@ -189,12 +186,10 @@ public class EnemyAiv2 : MonoBehaviour
             }
         }
     }
-
     private void ResetAttack()
     {
         alreadyAttacked = false;
     }
-
     public void TakeDamage(int damage)
     {
         health -= damage;
@@ -203,14 +198,10 @@ public class EnemyAiv2 : MonoBehaviour
             DestroyEnemy();
         }
     }
-
     void DestroyEnemy()
     {
         Destroy(gameObject);
     }
-
-   
-
     void GoToPlayer()
     {
         agent.SetDestination(player.transform.position);
