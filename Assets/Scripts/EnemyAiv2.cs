@@ -32,6 +32,8 @@ public class EnemyAiv2 : MonoBehaviour
     public Transform SpawnerPos;
     public GameObject Spawner;
 
+    public float razbrosRange;
+
 
     public GameObject[] Walls;      
     private void Awake()
@@ -163,6 +165,7 @@ public class EnemyAiv2 : MonoBehaviour
     }
     void AttackPlayer()
     {
+        float razbros = Random.Range(-razbrosRange,razbrosRange);
         Vector3 fwd = transform.TransformDirection(Vector3.forward);
         RaycastHit hit;
         agent.SetDestination(transform.position);
