@@ -15,7 +15,9 @@ namespace Valve.VR.InteractionSystem
     {
         public SteamVR_Action_Boolean teleportAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("Teleport");
 
-        public LayerMask traceLayerMask;
+		bool teleportOnCooldown = false;
+
+		public LayerMask traceLayerMask;
 		public LayerMask floorFixupTraceLayerMask;
 		public float floorFixupMaximumTraceDistance = 1.0f;
 		public Material areaVisibleMaterial;
@@ -849,7 +851,20 @@ namespace Valve.VR.InteractionSystem
 			headAudioSource.transform.localPosition = Vector3.zero;
 			PlayAudioClip( headAudioSource, teleportSound );
 
-			Invoke( "TeleportPlayer", currentFadeTime );
+			if (teleportOnCooldown == false)//кулдаун тп
+			{ 
+				Invoke("TeleportPlayer", currentFadeTime);
+				teleportOnCooldown = true;
+			}
+		}
+
+		IEnumerator CooldownTP()
+        {
+			if (teleportOnCooldown == true)
+			{
+				yield return new WaitForSeconds(0.5f);
+				teleportOnCooldown = false;
+			}
 		}
 
 

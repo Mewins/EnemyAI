@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class Heal : MonoBehaviour
 {
+   public PlayerStats Player;
   void TakeHeal(int value)
   {
-        //Player.Hp += value;
+        Player.Health += value;
         Destroy(gameObject);
   }
 }

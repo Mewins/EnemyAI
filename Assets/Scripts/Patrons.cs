@@ -6,7 +6,7 @@ public class Patrons : MonoBehaviour
 {
     void TakeAmmo()
     {
-        //Player.Hp+=value;
+        //Weapon.Ammo+=value;
         Destroy(gameObject);
     }
 
