@@ -13,7 +13,7 @@ public class EnemyAiv2 : MonoBehaviour
 
     public float health;
     public float maxhealth = 100f;
-    public int damage = 30;
+    public int damage = 30, lowHP = 30;
 
     public Vector3 walkPoint;
     public Vector3 hidePoint;
@@ -53,16 +53,16 @@ public class EnemyAiv2 : MonoBehaviour
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
-        //if (!playerInSightRange && !playerInAttackRange && health > 30) Patroling();
-        //if (playerInSightRange && !playerInAttackRange && health > 30) ChasePlayer();
-        //if (playerInSightRange && playerInAttackRange && health > 30) AttackPlayer();
-        if(playerInSightRange) Hide();
+        if (!playerInSightRange && Spawner.activeInHierarchy == false) Repair();
+        if (!playerInSightRange && !playerInAttackRange && health > lowHP) Patroling();
+        if (playerInSightRange && !playerInAttackRange && health > lowHP) ChasePlayer();
+        if (playerInSightRange && playerInAttackRange && health > lowHP) AttackPlayer();
+        if (playerInSightRange && health < lowHP) Hide();
     }
     void Hide()
     {
         RaycastHit raycastHit; 
-        Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward)*sightRange, Color.red);
-
+ 
         if (!hidePointSet)
         {
             HideFromPlayer();
@@ -86,7 +86,6 @@ public class EnemyAiv2 : MonoBehaviour
         GameObject closeWall = Walls[0];
         float randomZ = Random.Range(-hidePointRange, hidePointRange);
         float randomX = Random.Range(-hidePointRange, hidePointRange);
-        Debug.DrawRay(hidePoint, player.transform.position * sightRange, Color.green, 2);
 
         for (int i = 0; i < Walls.Length; i++)
         {

@@ -7,7 +7,7 @@ public class PlayerStats : MonoBehaviour
 {
     public int Health;
     private int MaxHealth = 100;
-    public int Damage = 20;
+    public int armor;
     public GameObject StartPos, DeathPos;
     public Slider slider;
 
@@ -27,16 +27,6 @@ public class PlayerStats : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            Health = -9999;
-        }
-        if (Health <= 0)
-        {
-            gameObject.transform.position = DeathPos.transform.position;
-            Health = 1;
-        }
-
         slider.value = Health;
     }
     void DestroyPlayer()
